@@ -17,7 +17,7 @@ def render_Graph(fig):
                     {"label":"F1 Score","value":"f1_score"},
                     {"label":"Recall Score","value":"recall"},
                     {"label":"Precision Score","value":"precision"},
-                ],value="accuracy",multi=False,placeholder="Select the model",clearable=False,id="_drpdwn_metric")
+                ],value="accuracy",multi=False,placeholder="Select the metric",clearable=False,id="_drpdwn_metric")
             ],className="col-md-4 col-8  mt-md-0 mt-5"),
         ],className="my-5 d-flex justify-content-around align-items-center flex-md-row flex-column "),
         dbc.Row([dbc.Col([dbc.Button("Show the graph",id="btn_show_graph",className="text-capitalize fw-normal fs-5 w-25")],className="col-12 d-flex justify-content-center ")],className =" my-5"),

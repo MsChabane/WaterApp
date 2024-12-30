@@ -16,7 +16,7 @@ def render_form_EDA_Section():
                                 {"label":"F1 Score","value":"f1_score"},
                                 {"label":"Recall Score","value":"recall"},
                                 {"label":"Precision Score","value":"precision"},
-                            ],value="accuracy",multi=False,clearable=False,id="_drpdwn_metric",style={'width':'200px'})
+                            ],value="accuracy",multi=False,clearable=False,id="_drpdwn_eda_metric",style={'width':'200px'})
                     ],className='col-12 d-flex  gap-xl-3 gap-0 px-5 flex-column flex-xl-row align-items-xl-center justify-content-xl-center align-itens-start'),
                 ],className='mb-3 '),
                 dbc.Row([dbc.Col([dbc.Button("populate the dataset",id="btn_fill_data",className="text-capitalize fw-normal fs-5")],className="col-12 d-flex justify-content-xl-center justify-content-start ")],className ="mt-3 px-5"),

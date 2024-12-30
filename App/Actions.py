@@ -116,7 +116,6 @@ def make_graph(method,metric):
     State("popsize","value"),
     State("knn_neirest_opt","value"),
     State("mpl_hlsize","value"),
-    
 ])
 def handel_Optimiser(n,model,epocks,popsize,n_neighbors,hidden_layer_size):
     global optimiser
@@ -135,7 +134,6 @@ def handel_Optimiser(n,model,epocks,popsize,n_neighbors,hidden_layer_size):
         render_table(optimiser.result),
         render_Graph(figure),
         render_form_EDA_Section()
-       
        ]]
    
 
@@ -149,7 +147,7 @@ def handel_Optimiser(n,model,epocks,popsize,n_neighbors,hidden_layer_size):
 def handel_graph_change(n,method,metric):
     figure = make_graph(method,metric)
     return figure,
-   
+    
    
 def _make_graphs(colName): 
     global df_filled
@@ -161,7 +159,7 @@ def _make_graphs(colName):
 @app.callback([
     Output("eda_result","children"),
     Input("btn_fill_data","n_clicks"),
-    State("_drpdwn_metric","value")
+    State("_drpdwn_eda_metric","value")
 ])   
 def fill_data(n,metric):
     global df_filled
