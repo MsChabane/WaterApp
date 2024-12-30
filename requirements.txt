@@ -1,8 +1,8 @@
-dash==2.18.1
-dash-bootstrap-components==1.6.0
-dash-core-components==2.0.0
-dash-html-components==2.0.0
-plotly==5.24.1
-scikit-learn==1.5.2
-numpy==2.0.1
+dash
+dash-bootstrap-components
+dash-core-components
+dash-html-components
+plotly
+scikit-learn
+numpy
 pandas 

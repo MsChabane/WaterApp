@@ -121,7 +121,7 @@ class Optimiser:
         return 1-self.metrics.get(self.current_metric)(filled_data.iloc[:,-1],self.mlp.predict(filled_data.iloc[:,:-1]))
     def _make_result(self,output):
         return {
-            "Fitness":np.round(1-output[1],2),"Solution":output[0],"curve":1-output[2]
+            "Fitness":np.round(1-output[1],3),"Solution":output[0],"curve":1-output[2]
         }
 
     def _get_chemin_max_fitness(self,metric):
