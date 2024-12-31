@@ -88,40 +88,42 @@ class Optimiser:
         dic_standard={}
         print('Using MLP ')
         print(">>> without standardisation ")
-
+        self.train,validation = train_test_split(self.train,test_size=0.2,random_state=self.random_seed)
         self.mlp.fit(self.train.iloc[:,:-1],self.train.iloc[:,-1])
         self.mlp_coef_Without_STD=self.mlp.coefs_
+        print(f"Validation score :{np.round(self.mlp.score(validation.iloc[:,:-1],validation.iloc[:,-1])*100,2)} %")
         for i in range(self.metrics.__len__()):
             self.current_metric=self.metrics_names[i]
             print(f"      >>> metric used {self.current_metric}")
             gbest=model.solve(self._obj_func_MLP_False)
             dic[f"{self.current_metric}"]=self._make_result( gbest)
         dic_standard["without_std"]=dic
-        self.mlp.fit(pd.DataFrame(self.standardscaler.fit_transform(self.train.iloc[:,:-1]),columns=self.train.columns[:-1]),self.train.iloc[:,-1])
-        self.mlp_coef_With_STD=self.mlp.coefs_
         print(">>> with standardisation ")
+        self.train.iloc[:,:-1]=self.standardscaler.fit_transform(self.train.iloc[:,:-1])
+        validation.iloc[:,:-1]=self.standardscaler.fit_transform(validation.iloc[:,:-1])
+        self.mlp.fit(self.train.iloc[:,:-1],self.train.iloc[:,-1])
+        self.mlp_coef_With_STD=self.mlp.coefs_
+        print(f"Validation score :{np.round(self.mlp.score(validation.iloc[:,:-1],validation.iloc[:,-1])*100,2)} %")
         dic={}
         for i in range(self.metrics.__len__()):
             self.current_metric=self.metrics_names[i]
             print(f"      >>> metric used {self.current_metric}")
             gbest=model.solve(self._obj_func_MLP_True)
-            dic[f"{self.current_metric}"]=self._make_result( gbest)
+            dic[f"{self.current_metric}"]=self._make_result(gbest)
         dic_standard["with_std"]=dic
         self.result["MLP"]=dic_standard
 
     def _obj_func_MLP_True(self,solution):
         filled_data=self._impute_values(self.concatenation.copy(),solution)
         filled_data.iloc[:,:-1] =  self.standardscaler.fit_transform(filled_data.iloc[:,:-1])
-        self.mlp.coefs_=self.mlp_coef_With_STD
         return 1-self.metrics.get(self.current_metric)(filled_data.iloc[:,-1],self.mlp.predict(filled_data.iloc[:,:-1]))
 
     def _obj_func_MLP_False(self,solution):
         filled_data=self._impute_values(self.concatenation.copy(),solution)
-        self.mlp.coefs_=self.mlp_coef_Without_STD
         return 1-self.metrics.get(self.current_metric)(filled_data.iloc[:,-1],self.mlp.predict(filled_data.iloc[:,:-1]))
     def _make_result(self,output):
         return {
-            "Fitness":np.round(1-output[1],3),"Solution":output[0],"curve":1-output[2]
+            "Fitness":round(1-output[1],3)*100,"Solution":output[0],"curve":1-output[2]
         }
 
     def _get_chemin_max_fitness(self,metric):
