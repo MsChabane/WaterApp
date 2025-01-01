@@ -2,7 +2,7 @@ from  App import dcc,dbc,html
 
 
 def render_form_EDA_Section():
-    container  = dbc.Container(
+    container  = html.Div(
         [
            dbc.Row([dbc.Col([html.H3("Exploratory data analysis",className="text-capitalize fw-bold fs-1 ")],className="col-12")],className =" mt-5"), 
            html.P("After identifying the optimal solution for each metric ,apply these solutions to populate the dataset, and proceed with data exploration .",className="fs-5 mt-2 text-wrap"),
@@ -29,7 +29,7 @@ def render_form_EDA_Section():
 
 
 def render_result_EDA (options,value,boxfig,histfig):
-    container=dbc.Container([
+    container=html.Div([
         dbc.Row([
             dbc.Col([
                 dcc.Graph(id='boxplot',figure=boxfig)

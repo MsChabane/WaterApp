@@ -1,12 +1,9 @@
 from dash import Output,Input,no_update,State
 from App import app,dbc,html
 from App.Optimiser import Optimiser
+from App.components.KnnImputer_Section import render_form_KNN,render_result_Knnimputer
+from App.components.Optimiser_Section import render_form_optimizer,render_Graph,render_table
 from App.components.Overview import overview
-from App.components.ResultKNNimputer import render_result_Knnimputer
-from App.components.FormOptimizer import render_form_optimizer
-from App.components.Table import render_table
-from App.components.fitness_graph import render_Graph
-from App.components.Form_KNNImputer import render_form_KNN
 from App.components.EDA import render_form_EDA_Section,render_result_EDA
 
 import numpy as np 
@@ -34,7 +31,7 @@ def handel_load_click(n):
     global optimiser
     if df is None :
         df = pd.read_csv("./App/assets/waterpotability.csv")
-        optimiser =Optimiser(data=df,random_seed=0)
+        optimiser =Optimiser(data=df)
     _check_nan= np.isnan(df).sum() 
     _to_overview={
         "Sambles":df.shape[0],
@@ -55,7 +52,6 @@ def handel_KNN_Imputer(n,knn_neibhord):
     global df 
     if  knn_neibhord ==None or knn_neibhord > df.shape[0]:
         warning=True
-        #alert = dbc.Alert("Neirest neibhord must be smaller than sambels ,By default used 2", color="warning",dismissable=True)
         knn_neibhord=2
     train,test=train_test_split(KNNImputer(n_neighbors=knn_neibhord).fit_transform(df))
     knn_classifier = KNeighborsClassifier(n_neighbors=knn_neibhord).fit(train[:,:-1],train[:,-1])
@@ -71,7 +67,7 @@ def handel_KNN_Imputer(n,knn_neibhord):
             ]
 
 
-def render_warnings(e,p,n,h):
+def render_warnings(e,p,n,h,r):
     global df
     warnings={}
     if e ==None :
@@ -90,14 +86,16 @@ def render_warnings(e,p,n,h):
         warnings["hiddenSize"]="Used the default value of 10 for Mlp hidden layer size "
     elif h >300:
         warnings["hiddenSize"]="too large value for Mlp hidden layer size,Used default value of 10 "
+    if r == None :
+        warnings["randomseed"]="Used the default value of 42 for Random seed "
     return warnings
 
 def make_graph(method,metric):
     global optimiser
     fig = go.Figure(
         data=[
-           go.Scatter(y=optimiser.result.get("KNN").get(method).get(metric).get("curve"),name="KN-Neighbors",mode="lines+markers") ,
-           go.Scatter(y=optimiser.result.get("MLP").get(method).get(metric).get("curve"),name="MLP-Classifier",mode="lines+markers"), 
+           go.Scatter(y=optimiser.result.get(method).get("KNN").get(metric).get("curve"),name="KN-Neighbors",mode="lines+markers") ,
+           go.Scatter(y=optimiser.result.get(method).get("MLP").get(metric).get("curve"),name="MLP-Classifier",mode="lines+markers"), 
         ],
         layout={
             'title':{'text':f"distrebution of {metric} {'with standardisation' if method=='with_std' else ''}"
@@ -111,28 +109,33 @@ def make_graph(method,metric):
 @app.callback([
     Output("result_Optemizer","children"),
     Input("btn_run_po","n_clicks"),
+    State("_drpdwn_strtg","value"),
+    State("randomseed","value"),
     State("_drpdwn_optmzr","value"),
     State("epocks","value"),
     State("popsize","value"),
     State("knn_neirest_opt","value"),
     State("mpl_hlsize","value"),
 ])
-def handel_Optimiser(n,model,epocks,popsize,n_neighbors,hidden_layer_size):
+def handel_Optimiser(n,strategy,random_seed,alogrithm,epocks,popsize,n_neighbors,hidden_layer_size):
     global optimiser
-    warnings =render_warnings(epocks,popsize,n_neighbors,hidden_layer_size)
+    print(strategy,random_seed,alogrithm)
+    warnings =render_warnings(epocks,popsize,n_neighbors,hidden_layer_size,random_seed)
     epocks = 2 if warnings.get("epocks") else epocks
     popsize = 2 if warnings.get("popsize") else popsize
     n_neighbors = 2 if warnings.get("neibhord") else n_neighbors
     hidden_layer_size = 10 if warnings.get("hiddenSize") else hidden_layer_size
-    optimiser.solve(model=model,num_epk=epocks,pop_size=popsize,n_neighbors=n_neighbors,neurons_num=hidden_layer_size)
+    random_seed = 42 if warnings.get("randomseed") else random_seed
+    print(random_seed)
     
+    optimiser.solve(random_seed=random_seed,strategy=strategy,algorithm=alogrithm,num_epk=epocks,pop_size=popsize,n_neighbors=n_neighbors,neurons_num=hidden_layer_size)
     figure = make_graph("with_std","accuracy")
     
     
     return [[
-        dbc.Alert([ html.Span(i,className=' p-3 text-capitalise')  for i in warnings.values()],color='warning',dismissable=True,className="mt-5 d-flex flex-column rounded"),
-        render_table(optimiser.result),
-        render_Graph(figure),
+        
+        render_table(result=optimiser.result,warnings=warnings),
+        render_Graph(fig=figure),
         render_form_EDA_Section()
        ]]
    
