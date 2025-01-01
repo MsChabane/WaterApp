@@ -1,7 +1,7 @@
 import dash 
 import dash_bootstrap_components as dbc
 from dash import  html,dcc
-from App.components.Header import render_header
+from App.components.header import render_header
 from App.components.Optimiser_Section import render_form_optimizer
 from App.components.KnnImputer_Section import render_form_KNN
 

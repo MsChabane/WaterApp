@@ -13,8 +13,7 @@ def render_header():
                     html.Img(src="./../assets/water.jfif",className="w-100 h-100 rounded ")
                     
                     ],className="col-12 col-md-4   "),
-                
-                
+
                 dbc.Col([
                     html.P("A Potable water is suitable for human consumption",className="text-start fs-3 text-capitalize")
                 ],className="col-12 col-md-8 d-flex align-items-md-center ")
@@ -34,5 +33,5 @@ def render_header():
             ],className="col-12 d-flex justify-content-center align-items-center")
         ],className="pb-5"),
 
-    ],className="bg-info")
+    ],className="")
     return header
